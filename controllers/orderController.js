@@ -56,12 +56,6 @@ export const updateOrderStatus = async (req, res, next) => {
     //Order status update
 
     const order = await Order.findById(req.params.id);
-    await updateOrderbuddyStatus(
-      order.orderbuddyId,
-      driverId,
-      status,
-      order.timeSet
-    );
 
     const updateOrderStatus = await Order.findByIdAndUpdate(
       orderId,
@@ -77,8 +71,15 @@ export const updateOrderStatus = async (req, res, next) => {
     );
 
     res.status(200).json(`Updated order status to ${req.query.status}`);
+
+    await updateOrderbuddyStatus(
+      order.orderbuddyId,
+      driverId,
+      status,
+      order.timeSet
+    );
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
     next(createError(404, "Order Not Found!"));
   }
 };
@@ -100,7 +101,6 @@ export const getOrders = async (req, res, next) => {
     // let { driverId, status, startDate, endDate, format } = query;
 
     let { startDate, endDate, ...others } = query;
-    console.log("others " + JSON.stringify(others));
     //this part is for all the date related stuf
     const now = new Date();
     const yesterday = date.format(date.addDays(now, -1), "YYYY-MM-DD");
@@ -122,15 +122,14 @@ export const getOrders = async (req, res, next) => {
     //it selects enddate + 1. otherwise it wont work to query the same start/enddate
     endDate = date.format(date.addDays(now, +1), "YYYY-MM-DD");
 
-    console.log(startDate);
-    console.log(endDate);
+    // console.log(startDate);
+    // console.log(endDate);
 
     const orders = await Order.find({
       ...others,
       date: { $gte: startDate, $lte: endDate },
     }).sort({ timeSet: 1 });
 
-    console.log(orders.length);
     res.status(200).json(orders);
   } catch (err) {
     console.log(err.message);

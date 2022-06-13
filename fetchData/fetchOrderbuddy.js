@@ -4,6 +4,7 @@ import date from "date-and-time";
 import moment from "moment";
 import axios from "axios";
 import convert from "xml-js";
+import { createError } from "../utils/createError.js";
 
 export const createHotel = async (req, res, next) => {};
 
@@ -48,6 +49,7 @@ export const fetchOrderbuddy = async (query, res) => {
 
     //formatting the object to the needs
     orders = orders.map((order) => {
+      order.coord._text = order.coord._text || "";
       return {
         orderbuddyId: order.id._text,
         orderbuddyStatus: order.status._text,
@@ -61,9 +63,20 @@ export const fetchOrderbuddy = async (query, res) => {
         zipcode: order.zipcode._text,
         city: order.city._text,
         coord: order.coord._text,
+        lat: order.coord._text.split(",")[0],
+        long: order.coord._text.split(",")[1],
         timeSet: order.time_set._text || "ZSM",
         date: order.date._text,
         remarks: order.remarks._text,
+        payment: {
+          method: order.payment._text,
+          total: order.total._text,
+        },
+        source: {
+          sourceType: order.source._text,
+          sourceId: order.source_id._text,
+        },
+        tel: order.tel._text,
         deleted: order.deleted._text,
       };
     });
@@ -88,6 +101,9 @@ const addOrder = async (order) => {
       return;
     } else {
       console.log(err.message);
+      createError(500, "Could not create order")
     }
   }
 };
+
+
