@@ -7,13 +7,17 @@ fetchOrderbuddy();
 fetchDrivers();
 calculateRoute();
 
-// cron.schedule("* * * * *", () => {
-//   fetchOrderbuddy();
-//   //   console.log(`fetched new orders: ${Date.now()}`);
-// });
+cron.schedule("* * * * *", () => {
+  fetchOrderbuddy();
+  //   console.log(`fetched new orders: ${Date.now()}`);
+});
 
-// fetchDrivers();
-// cron.schedule("*/100 * * * * *", () => {
-//   fetchDrivers();
-//   //   console.log(`fetched driver data: ${Date.now()}`);
-// });
+cron.schedule("*/100 * * * * *", () => {
+  fetchDrivers();
+  //   console.log(`fetched driver data: ${Date.now()}`);
+});
+
+cron.schedule("*/300 * * * * *", () => {
+  //   calculateRoute();
+  //   console.log(`fetched driver data: ${Date.now()}`);
+});

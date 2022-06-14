@@ -16,23 +16,6 @@ export const updateOrder = async (req, res, next) => {
   }
 };
 
-//updating the order status and orderbuddyStatus
-const updateOrderbuddyStatus = async (orderId, driverId, status, timeSet) => {
-  let url = `https://api.foodticket.nl/1/orders?id=${orderId}&deliverer_id=${driverId}&status=${status}&time_set=${timeSet}`;
-
-  var config = {
-    method: "patch",
-    url,
-    headers: {
-      "X-OrderBuddy-Client-Id": "5704",
-      "X-OrderBuddy-API-Key": "91ee337266ee0790e95a20bd5793c4dd",
-    },
-  };
-
-  const axiosRes = await axios(config);
-  return axiosRes;
-};
-
 //get 1 driver by mongodb Id
 export const getDriver = async (req, res, next) => {
   try {
@@ -52,12 +35,13 @@ export const getDrivers = async (req, res, next) => {
     if (query.active === "true") {
       drivers = await Driver.find({
         coord: { $ne: "" },
-      });
+      }).populate("currentRoute");
     } else {
-      drivers = await Driver.find();
+      drivers = await Driver.find().populate("currentRoute");
     }
     res.status(200).json(drivers);
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

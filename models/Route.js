@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 const RouteSchema = new mongoose.Schema({
   driverId: {
-    type: String,
-    required: true,
-    unique: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Driver",
+    default: undefined,
   },
   orders: {
     type: [String],

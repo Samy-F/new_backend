@@ -46,6 +46,7 @@ export const fetchDrivers = async () => {
       tomtomMode,
       tel: driver.tel._text,
       currentRoute: undefined,
+      routeTime: undefined,
     };
   });
 
@@ -58,6 +59,7 @@ export const fetchDrivers = async () => {
       );
       // console.log(driver);
     } catch (err) {
+      console.log(err);
       createError(500, "Could not update/create driver");
     }
   });

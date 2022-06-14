@@ -1,4 +1,5 @@
 import Order from "../models/Order.js";
+import Driver from "../models/Driver.js";
 import date from "date-and-time";
 import moment from "moment";
 import axios from "axios";
@@ -33,19 +34,22 @@ export const updateOrder = async (req, res, next) => {
 
 //updating the order status and orderbuddyStatus
 const updateOrderbuddyStatus = async (orderId, driverId, status, timeSet) => {
-  let url = `https://api.foodticket.nl/1/orders?id=${orderId}&deliverer_id=${driverId}&status=${status}&time_set=${timeSet}`;
+  try {
+    let url = `https://api.foodticket.nl/1/orders?id=${orderId}&deliverer_id=${driverId}&status=${status}&time_set=${timeSet}`;
 
-  var config = {
-    method: "patch",
-    url,
-    headers: {
-      "X-OrderBuddy-Client-Id": "5704",
-      "X-OrderBuddy-API-Key": "91ee337266ee0790e95a20bd5793c4dd",
-    },
-  };
+    var config = {
+      method: "patch",
+      url,
+      headers: {
+        "X-OrderBuddy-Client-Id": "5704",
+        "X-OrderBuddy-API-Key": "91ee337266ee0790e95a20bd5793c4dd",
+      },
+    };
 
-  const axiosRes = await axios(config);
-  return axiosRes;
+    const axiosRes = await axios(config);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const updateOrderStatus = async (req, res, next) => {
@@ -55,29 +59,47 @@ export const updateOrderStatus = async (req, res, next) => {
     let status = req.query.status;
     //Order status update
 
-    const order = await Order.findById(req.params.id);
+    if (status == "init") {
+      const order = await Order.findById(req.params.id);
 
-    const updateOrderStatus = await Order.findByIdAndUpdate(
-      orderId,
-      {
-        $set: {
-          status: status,
-          orderbuddyStatus: status,
-          driverId: driverId,
-          orderbuddyDriverId: driverId,
+      const updateOrderStatus = await Order.findByIdAndUpdate(
+        orderId,
+        {
+          $set: {
+            status: status,
+            orderbuddyStatus: status,
+            driverId: "0",
+            orderbuddyDriverId: "0",
+          },
         },
-      },
-      { new: true }
-    );
+        { new: true }
+      );
+    } else {
+      const driver = await Driver.findById(driverId);
 
-    res.status(200).json(`Updated order status to ${req.query.status}`);
+      const order = await Order.findById(req.params.id);
 
-    await updateOrderbuddyStatus(
-      order.orderbuddyId,
-      driverId,
-      status,
-      order.timeSet
-    );
+      const updateOrderStatus = await Order.findByIdAndUpdate(
+        orderId,
+        {
+          $set: {
+            status: status,
+            orderbuddyStatus: status,
+            driverId: driverId,
+            orderbuddyDriverId: driver.orderbuddyDriverId,
+          },
+        },
+        { new: true }
+      );
+
+      await updateOrderbuddyStatus(
+        order.orderbuddyId,
+        driver.orderbuddyDriverId,
+        status,
+        order.timeSet
+      );
+      res.status(200).json(`Updated order status to ${req.query.status}`);
+    }
   } catch (err) {
     console.log(err);
     next(createError(404, "Order Not Found!"));

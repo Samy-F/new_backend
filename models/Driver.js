@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Route from "./Route.js";
 
 const DriverSchema = new mongoose.Schema(
   {
@@ -38,8 +39,14 @@ const DriverSchema = new mongoose.Schema(
       type: Date,
     },
     currentRoute: {
-      type: String,
-      default: "",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Route",
+      required: true,
+      default: undefined,
+    },
+    routeTime: {
+      type: Number,
+      default: 0,
       required: true,
     },
     googleMode: {
