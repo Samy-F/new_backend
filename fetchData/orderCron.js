@@ -17,7 +17,7 @@ cron.schedule("*/100 * * * * *", () => {
   //   console.log(`fetched driver data: ${Date.now()}`);
 });
 
-cron.schedule("*/300 * * * * *", () => {
-  //   calculateRoute();
+cron.schedule("*/30 * * * * *", () => {
+  calculateRoute();
   //   console.log(`fetched driver data: ${Date.now()}`);
 });

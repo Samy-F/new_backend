@@ -12,7 +12,7 @@ const getRouteTime = async (origin, destination, mode) => {
   if (mode == "bicycle") {
     var config = {
       method: "get",
-      url: `https://api.tomtom.com/routing/1/calculateRoute/${origin}:${destination}/json?computeBestOrder=true&routeType=fastest&traffic=true&travelMode=${mode}&vehicleMaxSpeed=16&key=gch7cOKSHaEZtEUli5HqE4jMK6vcyMV1
+      url: `https://api.tomtom.com/routing/1/calculateRoute/${origin}:${destination}/json?computeBestOrder=true&routeType=fastest&traffic=true&travelMode=${mode}&vehicleMaxSpeed=25&key=gch7cOKSHaEZtEUli5HqE4jMK6vcyMV1
 `,
       headers: {},
     };
@@ -42,6 +42,9 @@ export const calculateRoute = async () => {
   try {
     //routetime starts at 0
     let routeTime = 0;
+
+    //extra time needed per order to deliver it
+    let extraOrderTime = 120;
 
     //looks for routes in the database
     let routes = await Route.find().populate("driverId");
@@ -73,6 +76,7 @@ export const calculateRoute = async () => {
         });
 
         if (orders.length > 0) {
+          routeTime += orders.length * extraOrderTime;
           for (let i = -1; i < orders.length; i++) {
             if (i === -1) {
               console.log("from driver coord to first order: 10");

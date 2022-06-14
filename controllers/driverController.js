@@ -29,7 +29,7 @@ export const getDriver = async (req, res, next) => {
 //get all today drivers
 export const getDrivers = async (req, res, next) => {
   let query = req.query;
-  console.log(query);
+
   try {
     let drivers;
     if (query.active === "true") {
